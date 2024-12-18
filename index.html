@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <title>Estabilidade de Embarcação</title>
+    <style>
+        body {
+            font-family: "Lexend", serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        h1 {
+            font-family: "Lexend", serif;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            font-family: "Lexend", serif;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #01448b;
+        }
+
+        .result,
+        .suggestions {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f3fe;
+            border: 1px solid #b3d8ff;
+            border-radius: 4px;
+        }
+
+        /* ÁGUA ANIMADA */
+        .water {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(to bottom, #ffffff 50%, #1d9ee9 100%);
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: wave-animation 4s infinite linear;
+        }
+
+        .wave:nth-child(2) {
+            top: 55%;
+            animation: wave-animation 6s infinite linear reverse;
+        }
+
+        @keyframes wave-animation {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* BARCO */
+        .boat-wrapper {
+            position: absolute;
+            width: 120px;
+            height: 135px;
+            left: 50%;
+            bottom: 20%;
+            transform: translateX(-50%);
+        }
+
+        .boat {
+            position: absolute;
+            width: 100%;
+            transition: transform 1s ease-in-out;
+        }
+
+        .stable {
+            animation: stable-motion 3s infinite ease-in-out;
+        }
+
+        .unstable {
+            animation: unstable-motion 2s ease-out forwards;
+        }
+
+        @keyframes stable-motion {
+
+            0%,
+            100% {
+                transform: rotate(-2deg);
+            }
+
+            50% {
+                transform: rotate(2deg);
+            }
+        }
+
+        @keyframes unstable-motion {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(0) rotate(90deg);
+            }
+
+            100% {
+                transform: translateY(100px) rotate(90deg);
+                /* O barco afunda 100px mantendo o ângulo de 90 graus */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Estabilidade de Embarcação</h1>
+
+    <!-- Animação de Flutuabilidade -->
+    <div class="water">
+        <div class="boat-wrapper">
+            <img src="img/barco.png" id="boat" class="boat" alt="Barco">
+        </div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="container">
+        <label for="width">Largura (m):</label>
+        <input type="number" id="width" placeholder="Digite a largura" step="0.01">
+
+        <label for="waterline">Altura da linha d'água (m):</label>
+        <input type="number" id="waterline" placeholder="Digite a altura da linha d'água" step="0.01">
+
+        <label for="gravity">Altura do centro de gravidade (m) acima da base:</label>
+        <input type="number" id="gravity" placeholder="Digite a altura do centro de gravidade" step="0.01">
+
+        <div class="button-group">
+            <button onclick="calculateStability()">Verificar Estabilidade</button>
+            <button id="reset" style="display: none;" onclick="resetForm()">Resetar</button>
+        </div>
+
+        <div class="result" id="result" style="display: none;"></div>
+        <div class="suggestions" id="suggestions" style="display: none;"></div>
+    </div>
+
+    <script>
+        function calculateStability() {
+            // Obter valores de entrada
+            const width = parseFloat(document.getElementById('width').value);
+            const waterline = parseFloat(document.getElementById('waterline').value);
+            const gravity = parseFloat(document.getElementById('gravity').value);
+
+            const resultDiv = document.getElementById('result');
+            const suggestionsDiv = document.getElementById('suggestions');
+            const boat = document.getElementById('boat');
+
+            // Verificar se todas as entradas são válidas
+            if (isNaN(width) || isNaN(waterline) || isNaN(gravity)) {
+                alert('Por favor, insira todos os valores corretamente.');
+                return;
+            }
+            
+
+            // Calcular o momento metacêntrico aproximado
+            const bm = (width ** 2) / (12 * waterline);
+            const gm = bm - (gravity - waterline / 2);
+
+            // Determinar a estabilidade
+            let stabilityMessage = '';
+            let suggestions = '';
+
+            if (gm > 0) {
+                stabilityMessage = `A embarcação está estável. MG (Altura Metacêntrica): ${gm.toFixed(2)} m.`;
+                suggestions = 'Nenhuma ação é necessária, a estabilidade está adequada.';
+                boat.className = 'boat stable';
+            } else {
+                stabilityMessage = `A embarcação está instável. MG (Altura Metacêntrica): ${gm.toFixed(2)} m.`;
+                suggestions = `
+                    <strong>Sugestões para melhorar a estabilidade:</strong><br>
+                    1. Reduza a altura do centro de gravidade, baixando pesos para o fundo da embarcação.<br>
+                    2. Aumente a largura da embarcação.<br>
+                `;
+                boat.className = 'boat unstable';
+            }
+
+            // Mostrar resultados
+            resultDiv.style.display = 'block';
+            suggestionsDiv.style.display = 'block';
+            resultDiv.innerHTML = stabilityMessage;
+            suggestionsDiv.innerHTML = suggestions;
+
+            // Exibir botão de resetar
+            document.getElementById('reset').style.display = 'inline-block';
+            document.getElementById('reset').style.backgroundColor = '#FF0000';
+        }
+
+        function resetForm() {
+            document.getElementById('width').value = '';
+            document.getElementById('waterline').value = '';
+            document.getElementById('gravity').value = '';
+
+            const resultDiv = document.getElementById('result');
+            const suggestionsDiv = document.getElementById('suggestions');
+            const boat = document.getElementById('boat');
+
+            resultDiv.style.display = 'none';
+            suggestionsDiv.style.display = 'none';
+            boat.className = 'boat';
+
+            document.getElementById('reset').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>
