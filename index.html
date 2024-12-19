@@ -4,9 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&family=Londrina+Solid:wght@100;300;400;900&display=swap"
+        rel="stylesheet">
+
     <title>Estabilidade de Embarcação</title>
     <style>
         body {
@@ -18,9 +26,12 @@
         }
 
         h1 {
-            font-family: "Lexend", serif;
+            font-family: "Londrina Solid", serif;
+            font-weight: 600;
+            font-style: normal;
             text-align: center;
             margin-top: 20px;
+            color: #01448b;
         }
 
         .container {
@@ -28,7 +39,7 @@
             margin: 30px auto;
             background: #fff;
             padding: 20px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 6px #01448b;
             border-radius: 8px;
         }
 
@@ -36,10 +47,12 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #01448b;
         }
 
         input {
-            width: 100%;
+            font-family: "Lexend", serif;
+            width: 97%;
             padding: 8px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
@@ -61,11 +74,21 @@
             padding: 10px 15px;
             cursor: pointer;
             font-size: 16px;
-            border-radius: 4px;
+            border-radius: 10px;
         }
 
         button:hover {
             background-color: #01448b;
+        }
+
+        #reset {
+            background-color: #FF0000;
+            /* Cor inicial: vermelho */
+        }
+
+        #reset:hover {
+            background-color: #B22222;
+            /* Cor ao passar o cursor: vermelho escuro */
         }
 
         .result,
@@ -140,11 +163,11 @@
 
             0%,
             100% {
-                transform: rotate(-2deg);
+                transform: rotate(-3deg);
             }
 
             50% {
-                transform: rotate(2deg);
+                transform: rotate(3deg);
             }
         }
 
@@ -166,7 +189,7 @@
 </head>
 
 <body>
-    <h1>Estabilidade de Embarcação</h1>
+    <h1>Estabilize Mar</h1>
 
     <!-- Animação de Flutuabilidade -->
     <div class="water">
@@ -180,7 +203,7 @@
         <label for="width">Largura (m):</label>
         <input type="number" id="width" placeholder="Digite a largura" step="0.01">
 
-        <label for="waterline">Altura da linha d'água (m):</label>
+        <label for="waterline">Altura da linha d'água (m) acima da base:</label>
         <input type="number" id="waterline" placeholder="Digite a altura da linha d'água" step="0.01">
 
         <label for="gravity">Altura do centro de gravidade (m) acima da base:</label>
@@ -206,12 +229,13 @@
             const suggestionsDiv = document.getElementById('suggestions');
             const boat = document.getElementById('boat');
 
-            // Verificar se todas as entradas são válidas
-            if (isNaN(width) || isNaN(waterline) || isNaN(gravity)) {
-                alert('Por favor, insira todos os valores corretamente.');
+            // Verificar se todas as entradas são válidas e positivas
+            if (isNaN(width) || isNaN(waterline) || isNaN(gravity) || width <= 0 || waterline <= 0 || gravity <= 0) {
+                alert('Por favor, insira valores válidos.');
                 return;
             }
-            
+
+
 
             // Calcular o momento metacêntrico aproximado
             const bm = (width ** 2) / (12 * waterline);
@@ -243,7 +267,6 @@
 
             // Exibir botão de resetar
             document.getElementById('reset').style.display = 'inline-block';
-            document.getElementById('reset').style.backgroundColor = '#FF0000';
         }
 
         function resetForm() {
